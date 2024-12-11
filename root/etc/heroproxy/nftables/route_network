@@ -1,0 +1,381 @@
+# IPv4 路由规则
+uci add network route
+uci set network.@route[-1].target='28.0.0.0'
+uci set network.@route[-1].netmask='255.0.0.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='8.8.8.8'
+uci set network.@route[-1].netmask='255.255.255.255'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='8.8.4.4'
+uci set network.@route[-1].netmask='255.255.255.255'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='1.1.1.1'
+uci set network.@route[-1].netmask='255.255.255.255'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='1.0.0.1'
+uci set network.@route[-1].netmask='255.255.255.255'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='9.9.9.9'
+uci set network.@route[-1].netmask='255.255.255.255'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='8.41.4.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='23.23.189.144'
+uci set network.@route[-1].netmask='255.255.255.240'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='23.246.0.0'
+uci set network.@route[-1].netmask='255.255.192.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='34.195.253.0'
+uci set network.@route[-1].netmask='255.255.255.128'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='37.77.184.0'
+uci set network.@route[-1].netmask='255.255.248.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='38.72.126.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='45.57.0.0'
+uci set network.@route[-1].netmask='255.255.128.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='52.24.178.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='52.35.140.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='54.204.25.0'
+uci set network.@route[-1].netmask='255.255.255.240'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='54.213.167.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='64.120.128.0'
+uci set network.@route[-1].netmask='255.255.128.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='66.197.128.0'
+uci set network.@route[-1].netmask='255.255.128.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='69.53.224.0'
+uci set network.@route[-1].netmask='255.255.224.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='103.87.204.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='108.175.32.0'
+uci set network.@route[-1].netmask='255.255.240.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='185.2.220.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='185.9.188.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='192.173.64.0'
+uci set network.@route[-1].netmask='255.255.192.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='198.38.96.0'
+uci set network.@route[-1].netmask='255.255.224.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='198.45.48.0'
+uci set network.@route[-1].netmask='255.255.240.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='203.75.84.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='203.198.13.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='203.198.80.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='207.45.72.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='208.75.76.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='210.0.153.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.108.56.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.108.4.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.108.8.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.108.16.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.108.12.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='149.154.160.0'
+uci set network.@route[-1].netmask='255.255.240.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.105.192.0'
+uci set network.@route[-1].netmask='255.255.254.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='91.108.20.0'
+uci set network.@route[-1].netmask='255.255.252.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='185.76.151.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+uci add network route
+uci set network.@route[-1].target='95.161.64.0'
+uci set network.@route[-1].netmask='255.255.240.0'
+uci set network.@route[-1].type='local'
+uci set network.@route[-1].table='100'
+uci set network.@route[-1].interface='lan'
+
+# IPv6 路由规则
+uci add network route6
+uci set network.@route6[-1].target='2001:b28:f23d::'
+uci set network.@route6[-1].netmask='48'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2001:b28:f23f::'
+uci set network.@route6[-1].netmask='48'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2001:67c:4e8::'
+uci set network.@route6[-1].netmask='48'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2001:b28:f23c::'
+uci set network.@route6[-1].netmask='48'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2a0a:f280::'
+uci set network.@route6[-1].netmask='32'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2607:fb10::'
+uci set network.@route6[-1].netmask='32'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2620:10c:7000::'
+uci set network.@route6[-1].netmask='44'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2a00:86c0::'
+uci set network.@route6[-1].netmask='32'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='2a03:5640::'
+uci set network.@route6[-1].netmask='32'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+uci add network route6
+uci set network.@route6[-1].target='fc00::'
+uci set network.@route6[-1].netmask='18'
+uci set network.@route6[-1].type='local'
+uci set network.@route6[-1].table='200'
+uci set network.@route6[-1].interface='lan'
+
+# 添加路由规则标记
+uci add network rule
+uci set network.@rule[-1].mark='1'
+uci set network.@rule[-1].lookup='100'
+
+uci add network rule6
+uci set network.@rule6[-1].mark='1'
+uci set network.@rule6[-1].lookup='200' 

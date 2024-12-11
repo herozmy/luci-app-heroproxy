@@ -1,0 +1,31 @@
+<%+header%>
+<h2><%:HeroProxy 设置%></h2>
+<div class="cbi-map-descr">
+    <%:HeroProxy 是一个基于 sing-box 的代理服务，支持 TProxy 模式。%>
+</div>
+
+<div class="cbi-section">
+    <h3><%:状态信息%></h3>
+    <div class="cbi-section-node">
+        <table class="cbi-section-table">
+            <tr class="cbi-section-table-row">
+                <td class="cbi-value-field">
+                    <div id="status_info"><%:加载中...%></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">//<![CDATA[
+    XHR.poll(3, '<%=url("admin/services/heroproxy/status")%>', null,
+        function(x, data) {
+            var tb = document.getElementById('status_info');
+            if (data && tb) {
+                tb.innerHTML = data.running ? '<%:运行中%>' : '<%:未运行%>';
+            }
+        }
+    );
+//]]></script>
+
+<%+footer%> 

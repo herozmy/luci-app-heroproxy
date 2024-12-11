@@ -1,0 +1,144 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+USE_PROCD=1
+DEFAULT_PROG=/usr/bin/sing-box
+DEFAULT_CONFIGFILE=/etc/heroproxy/config.json
+HEROPROXY_LOG=/etc/heroproxy/heroproxy.log
+SINGBOX_LOG=/etc/heroproxy/singbox.log
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $1" >> $HEROPROXY_LOG
+    logger -t heroproxy "$1"
+}
+
+# 创建日志文件
+create_log() {
+    [ -d /etc/heroproxy ] || mkdir -p /etc/heroproxy
+    [ -f $HEROPROXY_LOG ] || touch $HEROPROXY_LOG
+    [ -f $SINGBOX_LOG ] || touch $SINGBOX_LOG
+    chmod 0644 $HEROPROXY_LOG
+    chmod 0644 $SINGBOX_LOG
+}
+
+load_routes() {
+    log "开始加载路由规则..."
+    # 添加路由规则标记
+    ip rule add fwmark 1 table 100 2>/dev/null
+    ip -6 rule add fwmark 1 table 200 2>/dev/null
+    
+    # 加载路由规则
+    while IFS= read -r route; do
+        [ -n "$route" ] && [ "${route#\#}" = "$route" ] && {
+            eval "$route"
+        }
+    done < /etc/heroproxy/nftables/route_network
+    
+    # 应用更改
+    uci commit network
+    /etc/init.d/network reload
+    log "路由规则加载完成"
+}
+
+clean_routes() {
+    log "开始清理路由规则..."
+    # 清理路由规则标记
+    ip rule del fwmark 1 table 100 2>/dev/null
+    ip -6 rule del fwmark 1 table 200 2>/dev/null
+    
+    # 清理路由规则
+    local routes
+    routes=$(uci show network | grep "@route" | cut -d. -f2 | cut -d= -f1 | sort -ur)
+    for r in $routes; do
+        uci delete network.$r
+    done
+    
+    # 清理 IPv6 路由规则
+    routes=$(uci show network | grep "@route6" | cut -d. -f2 | cut -d= -f1 | sort -ur)
+    for r in $routes; do
+        uci delete network.$r
+    done
+    
+    uci commit network
+    /etc/init.d/network reload
+    log "路由规则清理完成"
+}
+
+start_service() {
+    create_log
+    
+    config_load heroproxy
+    local enabled
+    config_get_bool enabled config enabled 0
+    [ "$enabled" -eq 0 ] && {
+        log "服务未启用"
+        return 1
+    }
+    
+    # 获取自定义路径
+    local core_path config_path
+    config_get core_path config core_path "$DEFAULT_PROG"
+    config_get config_path config config_path "$DEFAULT_CONFIGFILE"
+    
+    # 检查核心程序
+    if [ ! -x "$core_path" ]; then
+        log "错误：核心程序 $core_path 不存在或不可执行"
+        return 1
+    fi
+    
+    # 检查配置文件
+    if [ ! -f "$config_path" ]; then
+        log "错误：配置文件 $config_path 不存在"
+        return 1
+    fi
+    
+    # 验证配置文件
+    $core_path check -c $config_path >> $SINGBOX_LOG 2>&1
+    if [ $? -ne 0 ]; then
+        log "错误：配置文件验证失败，详细信息请查看 singbox.log"
+        return 1
+    fi
+    
+    log "开始加载 NFT 规则..."
+    # 加载 NFT 规则
+    nft -f /etc/heroproxy/nftables/tproxy.conf
+    
+    # 加载路由规则
+    load_routes
+    
+    log "启动 sing-box 服务..."
+    # 启动 sing-box
+    procd_open_instance
+    procd_set_param command $core_path run -c $config_path
+    procd_set_param respawn
+    procd_set_param stderr 1
+    procd_set_param stdout 1
+    procd_set_param file "$config_path"
+    procd_set_param pidfile /var/run/heroproxy.pid
+    # 重定向输出到单独的日志文件
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param file "$SINGBOX_LOG"
+    procd_close_instance
+    
+    log "sing-box 服务启动完成"
+}
+
+stop_service() {
+    log "停止服务..."
+    
+    # 停止所有 sing-box 进程
+    killall sing-box 2>/dev/null
+    
+    # 清理 NFT 规则
+    nft flush ruleset
+    
+    # 清理路由规则
+    clean_routes
+    
+    log "服务已停止"
+}
+
+service_triggers() {
+    procd_add_reload_trigger "heroproxy"
+} 

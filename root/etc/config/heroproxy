@@ -1,0 +1,4 @@
+config heroproxy 'config'
+    option enabled '0'
+    option core_path '/usr/bin/sing-box'
+    option config_path '/etc/heroproxy/config.json' 

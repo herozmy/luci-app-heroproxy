@@ -1,0 +1,16 @@
+<%+cbi/valueheader%>
+<span class="status_<%=self:cfgvalue(section)%>">
+<%
+local pid = luci.sys.exec("pgrep -f sing-box")
+if pid ~= "" then
+%>
+    <span style="color: green"><%:运行中%></span>
+<%
+else
+%>
+    <span style="color: red"><%:未运行%></span>
+<%
+end
+%>
+</span>
+<%+cbi/valuefooter%> 
