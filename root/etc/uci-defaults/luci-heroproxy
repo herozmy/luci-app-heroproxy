@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# 添加到 ucitrack
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@heroproxy[-1]
+	add ucitrack heroproxy
+	set ucitrack.@heroproxy[-1].init=heroproxy
+	commit ucitrack
+EOF
+
+# 创建默认配置
+uci -q batch <<-EOF >/dev/null
+	set heroproxy.config=heroproxy
+	set heroproxy.config.enabled='0'
+	set heroproxy.config.core_path='/usr/bin/sing-box'
+	set heroproxy.config.config_path='/etc/heroproxy/config.json'
+	set heroproxy.config.mosdns_enabled='0'
+	set heroproxy.config.mosdns_path='/usr/bin/mosdns'
+	set heroproxy.config.mosdns_config='/etc/heroproxy/mosdns/config.yaml'
+	commit heroproxy
+EOF
+
+# 创建必要的目录和文件
+mkdir -p /etc/heroproxy/nftables
+touch /etc/heroproxy/heroproxy.log
+touch /etc/heroproxy/singbox.log
+touch /etc/heroproxy/mosdns.log
+
+# 设置权限
+chmod 755 /etc/init.d/heroproxy
+chmod 644 /etc/config/heroproxy
+chmod 644 /etc/heroproxy/*.log
+
+rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
+exit 0 

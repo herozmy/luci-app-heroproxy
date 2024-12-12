@@ -1,16 +1,34 @@
-<%+cbi/valueheader%>
-<span class="status_<%=self:cfgvalue(section)%>">
 <%
-local pid = luci.sys.exec("pgrep -f sing-box")
-if pid ~= "" then
-%>
-    <span style="color: green"><%:运行中%></span>
-<%
-else
-%>
-    <span style="color: red"><%:未运行%></span>
-<%
-end
-%>
-</span>
-<%+cbi/valuefooter%> 
+local dsp = require "luci.dispatcher"
+-%>
+
+<script type="text/javascript">//<![CDATA[
+XHR.poll(3, '<%=dsp.build_url("admin/services/heroproxy/status")%>', null,
+    function(x, data) {
+        var tb = document.getElementById('heroproxy_status');
+        var tb2 = document.getElementById('mosdns_status');
+        if (data && tb && tb2) {
+            if (data.singbox_running) {
+                tb.innerHTML = '<em><b><font color=green><%:运行中%></font></b></em>';
+            } else {
+                tb.innerHTML = '<em><b><font color=red><%:未运行%></font></b></em>';
+            }
+            
+            if (data.mosdns_running) {
+                tb2.innerHTML = '<em><b><font color=green><%:运行中%></font></b></em>';
+            } else {
+                tb2.innerHTML = '<em><b><font color=red><%:未运行%></font></b></em>';
+            }
+        }
+    }
+);
+//]]></script>
+
+<style>.mar-10 { margin-left: 50px; margin-right: 10px; }</style>
+<fieldset class="cbi-section">
+    <p>
+    Sing-box 状态：<span id="heroproxy_status"><em><%:获取中...%></em></span>
+    <span class="mar-10"></span>
+    Mosdns 状态：<span id="mosdns_status"><em><%:获取中...%></em></span>
+    </p>
+</fieldset> 

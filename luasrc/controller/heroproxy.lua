@@ -15,7 +15,8 @@ end
 
 function action_status()
     local e = {}
-    e.running = luci.sys.call("pgrep -f sing-box >/dev/null") == 0
+    e.singbox_running = luci.sys.call("pgrep -f sing-box >/dev/null") == 0
+    e.mosdns_running = luci.sys.call("pgrep -f mosdns >/dev/null") == 0
     luci.http.prepare_content("application/json")
     luci.http.write_json(e)
 end

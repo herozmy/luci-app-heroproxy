@@ -4,8 +4,11 @@ START=99
 USE_PROCD=1
 DEFAULT_PROG=/usr/bin/sing-box
 DEFAULT_CONFIGFILE=/etc/heroproxy/config.json
+DEFAULT_MOSDNS=/usr/bin/mosdns
+DEFAULT_MOSDNS_CONFIG=/etc/heroproxy/mosdns/config.yaml
 HEROPROXY_LOG=/etc/heroproxy/heroproxy.log
 SINGBOX_LOG=/etc/heroproxy/singbox.log
+MOSDNS_LOG=/etc/heroproxy/mosdns.log
 
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') $1" >> $HEROPROXY_LOG
@@ -17,8 +20,10 @@ create_log() {
     [ -d /etc/heroproxy ] || mkdir -p /etc/heroproxy
     [ -f $HEROPROXY_LOG ] || touch $HEROPROXY_LOG
     [ -f $SINGBOX_LOG ] || touch $SINGBOX_LOG
+    [ -f $MOSDNS_LOG ] || touch $MOSDNS_LOG
     chmod 0644 $HEROPROXY_LOG
     chmod 0644 $SINGBOX_LOG
+    chmod 0644 $MOSDNS_LOG
 }
 
 load_routes() {
@@ -64,8 +69,57 @@ clean_routes() {
     log "路由规则清理完成"
 }
 
+start_mosdns() {
+    config_load heroproxy
+    local enabled
+    config_get_bool enabled config mosdns_enabled 0
+    [ "$enabled" -eq 0 ] && {
+        log "mosdns 服务未启用"
+        return 1
+    }
+    
+    # 获取自定义路径
+    local mosdns_path mosdns_config
+    config_get mosdns_path config mosdns_path "$DEFAULT_MOSDNS"
+    config_get mosdns_config config mosdns_config "$DEFAULT_MOSDNS_CONFIG"
+    
+    # 检查核心程序
+    if [ ! -x "$mosdns_path" ]; then
+        log "错误：mosdns 程序 $mosdns_path 不存在或不可执行"
+        return 1
+    fi
+    
+    # 检查配置文件
+    if [ ! -f "$mosdns_config" ]; then
+        log "错误：mosdns 配置文件 $mosdns_config 不存在"
+        return 1
+    fi
+    
+    log "启动 mosdns 服务..."
+    procd_open_instance mosdns
+    procd_set_param command $mosdns_path start -c $mosdns_config
+    procd_set_param respawn
+    procd_set_param stderr 1
+    procd_set_param stdout 1
+    procd_set_param file "$mosdns_config"
+    procd_set_param pidfile /var/run/mosdns.pid
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param file "$MOSDNS_LOG"
+    procd_close_instance
+    
+    log "mosdns 服务启动完成"
+}
+
+stop_mosdns() {
+    log "停止 mosdns 服务..."
+    killall mosdns 2>/dev/null
+    log "mosdns 服务已停止"
+}
+
 start_service() {
     create_log
+    start_mosdns
     
     config_load heroproxy
     local enabled
@@ -127,6 +181,9 @@ start_service() {
 stop_service() {
     log "停止服务..."
     
+    # 停止 mosdns
+    stop_mosdns
+    
     # 停止所有 sing-box 进程
     killall sing-box 2>/dev/null
     
@@ -137,6 +194,14 @@ stop_service() {
     clean_routes
     
     log "服务已停止"
+}
+
+mosdns_start() {
+    start_mosdns
+}
+
+mosdns_stop() {
+    stop_mosdns
 }
 
 service_triggers() {
