@@ -1,0 +1,100 @@
+<%+cbi/valueheader%>
+<div class="cbi-value-field">
+    <div class="core-info">
+        <div class="status">
+            <span><%:核心状态:%></span>
+            <span id="<%=self.core_type%>_status"><%:检查中...%></span>
+        </div>
+        <div class="version">
+            <span><%:当前版本:%></span>
+            <span id="<%=self.core_type%>_version"><%:检查中...%></span>
+        </div>
+        <div class="download" id="<%=self.core_type%>_download" style="display: none;">
+            <input type="button" class="btn cbi-button cbi-button-apply" value="<%:下载安装%>" onclick="downloadCore('<%=self.core_type%>')"/>
+        </div>
+        <div class="update" id="<%=self.core_type%>_update" style="display: none;">
+            <input type="button" class="btn cbi-button cbi-button-apply" value="<%:更新核心%>" onclick="downloadCore('<%=self.core_type%>')"/>
+        </div>
+        <% if self.core_path then %>
+        <div class="path">
+            <span><%:核心路径:%></span>
+            <span><%=self.core_path%></span>
+        </div>
+        <div class="path">
+            <span><%:配置路径:%></span>
+            <span><%=self.config_path%></span>
+        </div>
+        <% end %>
+    </div>
+</div>
+
+<script type="text/javascript">//<![CDATA[
+function downloadCore(type) {
+    var urls = {
+        'singbox': 'https://github.com/herozmy/StoreHouse/releases/download/sing-box/sing-box-release-linux-amd64.tar.gz',
+        'singbox-p': 'https://github.com/herozmy/StoreHouse/releases/download/sing-box/sing-box-puernya-linux-amd64.tar.gz',
+        'singbox-x': '<!-- X核心下载地址待定 -->',
+        'mosdns': '<!-- mosdns下载地址待定 -->'
+    };
+    
+    var paths = {
+        'singbox': '/etc/heroproxy/core/sing-box/sing-box',
+        'singbox-p': '/etc/heroproxy/core/sing-box-p/sing-box',
+        'singbox-x': '/etc/heroproxy/core/sing-box-x/sing-box'
+    };
+    
+    if (!urls[type]) {
+        return;
+    }
+    
+    var btn = document.querySelector('#' + type + '_download .btn') || 
+              document.querySelector('#' + type + '_update .btn');
+    var btnText = btn.value;
+    btn.disabled = true;
+    btn.value = '下载中...';
+    
+    XHR.get('<%=luci.dispatcher.build_url("admin/services/heroproxy/download_core")%>', 
+        { type: type, url: urls[type], path: paths[type] },
+        function(x, data) {
+            if (data && data.success) {
+                location.reload();
+            } else {
+                btn.disabled = false;
+                btn.value = btnText;
+            }
+        }
+    );
+}
+
+XHR.poll(3, '<%=luci.dispatcher.build_url("admin/services/heroproxy/check_core")%>', null,
+    function(x, data) {
+        if (data) {
+            var type = '<%=self.core_type%>';
+            var exists = false;
+            var version = '';
+            
+            if (type === 'mosdns') {
+                exists = data.mosdns_exists;
+                version = data.mosdns_version;
+            } else {
+                exists = data[type + '_exists'];
+                version = data[type + '_version'];
+            }
+            
+            document.getElementById(type + '_status').innerHTML = exists ? 
+                '<span style="color: green;"><%:已安装%></span>' : 
+                '<span style="color: red;"><%:未安装%></span>';
+            
+            document.getElementById(type + '_version').innerHTML = exists ? 
+                version : '<%:未安装%>';
+            
+            // 显示下载或更新按钮
+            document.getElementById(type + '_download').style.display = 
+                exists ? 'none' : 'block';
+            document.getElementById(type + '_update').style.display = 
+                exists ? 'block' : 'none';
+        }
+    }
+);
+//]]></script>
+<%+cbi/valuefooter%> 

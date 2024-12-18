@@ -523,13 +523,13 @@
   "experimental": {
     "clash_api": {
       "external_controller": "0.0.0.0:9090",
-      "external_ui": "/etc/sing-box/ui/",
+      "external_ui": "/etc/heroproxy/ui/",
       "secret": "",
       "default_mode": "rule"
     },
     "cache_file": {
       "enabled": true,
-      "path": "/etc/sing-box/cache.db",
+      "path": "/etc/heroproxy/cache.db",
       "cache_id": "my_profile1",
       "store_fakeip": true
     }

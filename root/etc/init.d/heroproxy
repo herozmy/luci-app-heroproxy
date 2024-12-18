@@ -31,7 +31,7 @@ start_service() {
     if [ "$enabled" = "1" ]; then
         log "Starting service..."
         
-        # 创建日志文件并设置权限
+        # 创建日志文��并设置权限
         mkdir -p /etc/heroproxy/mosdns
         touch /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
         chmod 666 /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
@@ -178,4 +178,13 @@ service_triggers() {
 reload_service() {
     stop
     start
+}
+
+start() {
+    # 确保目录存在
+    mkdir -p /etc/heroproxy/rule/geoip
+    mkdir -p /etc/heroproxy/rule/geosite
+    
+    # 启动服务
+    /etc/init.d/heroproxy start
 } 

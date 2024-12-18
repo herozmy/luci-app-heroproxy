@@ -49,7 +49,7 @@ msgstr "运行状态"
 msgid "刷新状态"
 msgstr "刷新状态"
 
-msgid "刷���"
+msgid "刷新"
 msgstr "刷新"
 
 msgid "Sing-box Status"
@@ -77,4 +77,32 @@ msgid "配置文件路径"
 msgstr "配置文件路径"
 
 msgid "工作目录"
-msgstr "工作目录" 
+msgstr "工作目录"
+
+msgid "核心管理"
+msgstr "核心管理"
+
+msgid "Sing-box 核心"
+msgstr "Sing-box 核心"
+
+msgid "Mosdns 核心"
+msgstr "Mosdns 核心"
+
+msgid "核心状态:"
+msgstr "核心状态:"
+
+msgid "当前版本:"
+msgstr "当前版本:"
+
+msgid "检查中..."
+msgstr "检查中..."
+
+msgid "已安装"
+msgstr "已安装"
+
+msgid "未安装"
+msgstr "未安装"
+
+msgid "下载安装"
+msgstr "下载安装"
+ 
