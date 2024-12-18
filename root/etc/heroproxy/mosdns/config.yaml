@@ -1,6 +1,6 @@
 log:
   level: info
-  file: "/etc/heroproxy/mosdns/mosdns.log"
+  file: "/etc/heroproxy/mosdns.log"
 
 api:
   http: "0.0.0.0:8338"
