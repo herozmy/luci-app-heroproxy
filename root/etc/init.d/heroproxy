@@ -2,208 +2,175 @@
 
 START=99
 USE_PROCD=1
-DEFAULT_PROG=/usr/bin/sing-box
-DEFAULT_CONFIGFILE=/etc/heroproxy/config.json
-DEFAULT_MOSDNS=/usr/bin/mosdns
-DEFAULT_MOSDNS_CONFIG=/etc/heroproxy/mosdns/config.yaml
-HEROPROXY_LOG=/etc/heroproxy/heroproxy.log
-SINGBOX_LOG=/etc/heroproxy/singbox.log
-MOSDNS_LOG=/etc/heroproxy/mosdns.log
 
+# 修改日志函数
 log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') $1" >> $HEROPROXY_LOG
-    logger -t heroproxy "$1"
-}
-
-# 创建日志文件
-create_log() {
-    [ -d /etc/heroproxy ] || mkdir -p /etc/heroproxy
-    [ -f $HEROPROXY_LOG ] || touch $HEROPROXY_LOG
-    [ -f $SINGBOX_LOG ] || touch $SINGBOX_LOG
-    [ -f $MOSDNS_LOG ] || touch $MOSDNS_LOG
-    chmod 0644 $HEROPROXY_LOG
-    chmod 0644 $SINGBOX_LOG
-    chmod 0644 $MOSDNS_LOG
-}
-
-load_routes() {
-    log "开始加载路由规则..."
-    # 添加路由规则标记
-    ip rule add fwmark 1 table 100 2>/dev/null
-    ip -6 rule add fwmark 1 table 200 2>/dev/null
+    local msg="$1"
+    local time=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "[$time] $msg" >> /etc/heroproxy/heroproxy.log
     
-    # 加载路由规则
-    while IFS= read -r route; do
-        [ -n "$route" ] && [ "${route#\#}" = "$route" ] && {
-            eval "$route"
-        }
-    done < /etc/heroproxy/nftables/route_network
-    
-    # 应用更改
-    uci commit network
-    /etc/init.d/network reload
-    log "路由规则加载完成"
-}
-
-clean_routes() {
-    log "开始清理路由规则..."
-    # 清理路由规则标记
-    ip rule del fwmark 1 table 100 2>/dev/null
-    ip -6 rule del fwmark 1 table 200 2>/dev/null
-    
-    # 清理路由规则
-    local routes
-    routes=$(uci show network | grep "@route" | cut -d. -f2 | cut -d= -f1 | sort -ur)
-    for r in $routes; do
-        uci delete network.$r
-    done
-    
-    # 清理 IPv6 路由规则
-    routes=$(uci show network | grep "@route6" | cut -d. -f2 | cut -d= -f1 | sort -ur)
-    for r in $routes; do
-        uci delete network.$r
-    done
-    
-    uci commit network
-    /etc/init.d/network reload
-    log "路由规则清理完成"
-}
-
-start_mosdns() {
-    config_load heroproxy
-    local enabled
-    config_get_bool enabled config mosdns_enabled 0
-    [ "$enabled" -eq 0 ] && {
-        log "mosdns 服务未启用"
-        return 1
-    }
-    
-    # 获取自定义路径
-    local mosdns_path mosdns_config
-    config_get mosdns_path config mosdns_path "$DEFAULT_MOSDNS"
-    config_get mosdns_config config mosdns_config "$DEFAULT_MOSDNS_CONFIG"
-    
-    # 检查核心程序
-    if [ ! -x "$mosdns_path" ]; then
-        log "错误：mosdns 程序 $mosdns_path 不存在或不可执行"
-        return 1
+    # 限制日志大小
+    if [ -f /etc/heroproxy/heroproxy.log ]; then
+        local size=$(wc -c < /etc/heroproxy/heroproxy.log)
+        if [ $size -gt 1048576 ]; then  # 1MB
+            tail -c 524288 /etc/heroproxy/heroproxy.log > /etc/heroproxy/heroproxy.log.tmp
+            mv /etc/heroproxy/heroproxy.log.tmp /etc/heroproxy/heroproxy.log
+        fi
     fi
-    
-    # 检查配置文件
-    if [ ! -f "$mosdns_config" ]; then
-        log "错误：mosdns 配置文件 $mosdns_config 不存在"
-        return 1
-    fi
-    
-    log "启动 mosdns 服务..."
-    procd_open_instance mosdns
-    procd_set_param command $mosdns_path start -c $mosdns_config
-    procd_set_param respawn
-    procd_set_param stderr 1
-    procd_set_param stdout 1
-    procd_set_param file "$mosdns_config"
-    procd_set_param pidfile /var/run/mosdns.pid
-    procd_set_param stdout 1
-    procd_set_param stderr 1
-    procd_set_param file "$MOSDNS_LOG"
-    procd_close_instance
-    
-    log "mosdns 服务启动完成"
-}
-
-stop_mosdns() {
-    log "停止 mosdns 服务..."
-    killall mosdns 2>/dev/null
-    log "mosdns 服务已停止"
 }
 
 start_service() {
-    create_log
-    start_mosdns
-    
     config_load heroproxy
-    local enabled
-    config_get_bool enabled config enabled 0
-    [ "$enabled" -eq 0 ] && {
-        log "服务未启用"
-        return 1
-    }
+    config_get enabled config enabled "0"
     
-    # 获取自定义路径
-    local core_path config_path
-    config_get core_path config core_path "$DEFAULT_PROG"
-    config_get config_path config config_path "$DEFAULT_CONFIGFILE"
-    
-    # 检查核心程序
-    if [ ! -x "$core_path" ]; then
-        log "错误：核心程序 $core_path 不存在或不可执行"
-        return 1
+    if [ "$enabled" = "1" ]; then
+        log "Starting service..."
+        
+        # 创建日志文件并设置权限
+        mkdir -p /etc/heroproxy/mosdns
+        touch /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
+        chmod 666 /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
+        
+        # 修改 dnsmasq 配置
+        log "Configuring dnsmasq..."
+        uci set dhcp.@dnsmasq[0].port='5335'
+        uci set dhcp.@dnsmasq[0].dns_redirect='1'
+        uci set dhcp.@dnsmasq[0].localuse='1'
+        uci commit dhcp
+        /etc/init.d/dnsmasq restart
+        
+        # 重启网络使配置生效
+        log "Restarting network..."
+        /etc/init.d/network restart
+        sleep 2
+        
+        # 启动 mosdns
+        log "Starting mosdns..."
+        if [ -f /usr/bin/mosdns ]; then
+            # 确保 mosdns 目录存在
+            mkdir -p /etc/heroproxy/mosdns
+            
+            procd_open_instance mosdns
+            procd_set_param command /usr/bin/mosdns start -d /etc/heroproxy/mosdns -c /etc/heroproxy/mosdns/config.yaml
+            procd_set_param respawn
+            procd_set_param stdout 1
+            procd_set_param stderr 1
+            procd_set_param file /etc/heroproxy/mosdns/mosdns.log
+            procd_close_instance
+            
+            sleep 2
+        fi
+        
+        # 添加网络配置
+        log "Adding network configuration..."
+        if [ ! -f /etc/config/network.heroproxy.bak ]; then
+            cp /etc/config/network /etc/config/network.heroproxy.bak
+            cat /etc/heroproxy/nftables/route_network >> /etc/config/network
+            /etc/init.d/network restart
+        else
+            log "Warning: Backup file already exists, skipping network configuration"
+        fi
+        
+        # 添加防火墙和路由规则
+        log "Adding firewall and routing rules..."
+        nft -f /etc/heroproxy/nftables/tproxy.conf
+        
+        # 启动 sing-box
+        log "Starting sing-box..."
+        if [ -f /usr/bin/sing-box ]; then
+            # 检查配置文件
+            if [ ! -f /etc/heroproxy/config.json ]; then
+                log "Error: sing-box config file not found"
+                return 1
+            fi
+            
+            # 验证配置文件
+            if ! /usr/bin/sing-box check -c /etc/heroproxy/config.json; then
+                log "Error: sing-box config check failed"
+                return 1
+            fi
+            
+            procd_open_instance singbox
+            procd_set_param command /usr/bin/sing-box run -c /etc/heroproxy/config.json
+            procd_set_param respawn
+            procd_set_param stdout 1
+            procd_set_param stderr 1
+            procd_set_param file /etc/heroproxy/singbox.log
+            procd_close_instance
+            
+            # 等待 sing-box 启动
+            sleep 2
+            
+            # 检查是否成功启动
+            if ! pgrep sing-box >/dev/null; then
+                log "Error: sing-box failed to start"
+                return 1
+            fi
+            
+            log "Sing-box started successfully"
+        else
+            log "Error: sing-box binary not found"
+            return 1
+        fi
+        
+        log "Service started successfully"
+    else
+        log "Service is disabled, not starting"
     fi
-    
-    # 检查配置文件
-    if [ ! -f "$config_path" ]; then
-        log "错误：配置文件 $config_path 不存在"
-        return 1
-    fi
-    
-    # 验证配置文件
-    $core_path check -c $config_path >> $SINGBOX_LOG 2>&1
-    if [ $? -ne 0 ]; then
-        log "错误：配置文件验证失败，详细信息请查看 singbox.log"
-        return 1
-    fi
-    
-    log "开始加载 NFT 规则..."
-    # 加载 NFT 规则
-    nft -f /etc/heroproxy/nftables/tproxy.conf
-    
-    # 加载路由规则
-    load_routes
-    
-    log "启动 sing-box 服务..."
-    # 启动 sing-box
-    procd_open_instance
-    procd_set_param command $core_path run -c $config_path
-    procd_set_param respawn
-    procd_set_param stderr 1
-    procd_set_param stdout 1
-    procd_set_param file "$config_path"
-    procd_set_param pidfile /var/run/heroproxy.pid
-    # 重定向输出到单独的日志文件
-    procd_set_param stdout 1
-    procd_set_param stderr 1
-    procd_set_param file "$SINGBOX_LOG"
-    procd_close_instance
-    
-    log "sing-box 服务启动完成"
 }
 
 stop_service() {
-    log "停止服务..."
+    log "Stopping service..."
     
-    # 停止 mosdns
-    stop_mosdns
-    
-    # 停止所有 sing-box 进程
+    # 先停止服务进程
+    procd_kill singbox
+    procd_kill mosdns
     killall sing-box 2>/dev/null
+    killall mosdns 2>/dev/null
+    sleep 2
     
-    # 清理 NFT 规则
-    nft flush ruleset
+    # 删除防火墙规则
+    nft delete table inet singbox 2>/dev/null
     
-    # 清理路由规则
-    clean_routes
+    # 恢复 dnsmasq 配置但暂不重启
+    log "Restoring dnsmasq config..."
+    uci set dhcp.@dnsmasq[0].port='53'
+    uci delete dhcp.@dnsmasq[0].dns_redirect 2>/dev/null
+    uci delete dhcp.@dnsmasq[0].localuse 2>/dev/null
+    uci commit dhcp
     
-    log "服务已停止"
-}
-
-mosdns_start() {
-    start_mosdns
-}
-
-mosdns_stop() {
-    stop_mosdns
+    # 恢复网络配置但暂不重启
+    if [ -f /etc/config/network.heroproxy.bak ]; then
+        log "Restoring network config..."
+        cp /etc/config/network.heroproxy.bak /etc/config/network
+        rm -f /etc/config/network.heroproxy.bak
+    fi
+    
+    # 清理日志文件
+    log "Cleaning log files..."
+    : > /etc/heroproxy/heroproxy.log
+    : > /etc/heroproxy/mosdns/mosdns.log
+    : > /etc/heroproxy/singbox.log 2>/dev/null
+    
+    # 最后一次性重启所有服务
+    log "Restarting services..."
+    /etc/init.d/dnsmasq restart
+    sleep 1
+    
+    # 使用 ubus 调用网络重启，这样更温和
+    ubus call network reload
+    
+    log "Service stopped"
+    
+    # 给 LuCI 一点时间完成响应
+    sleep 1
 }
 
 service_triggers() {
     procd_add_reload_trigger "heroproxy"
+}
+
+reload_service() {
+    stop
+    start
 } 

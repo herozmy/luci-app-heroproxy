@@ -1,6 +1,6 @@
 log:
   level: info
-  file: "/etc/homeproxy/mosdnsmosdns.log"
+  file: "/etc/heroproxy/mosdns/mosdns.log"
 
 api:
   http: "0.0.0.0:8338"
@@ -12,67 +12,67 @@ plugins:
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsgeosite_cn.txt"
+        - "/etc/heroproxy/mosdns/geosite_cn.txt"
 
   - tag: geoip_cn
     type: ip_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsgeoip_cn.txt"
+        - "/etc/heroproxy/mosdns/geoip_cn.txt"
 
   - tag: geosite_no_cn
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsgeosite_geolocation_noncn.txt"
+        - "/etc/heroproxy/mosdns/geosite_geolocation_noncn.txt"
 
   - tag: whitelist
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/whitelist.txt"
+        - "/etc/heroproxy/mosdns/rule/whitelist.txt"
 
   - tag: blocklist
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/blocklist.txt"
+        - "/etc/heroproxy/mosdns/rule/blocklist.txt"
 
   - tag: greylist
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/greylist.txt"
+        - "/etc/heroproxy/mosdns/rule/greylist.txt"
 
   - tag: ddnslist
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/ddnslist.txt"
+        - "/etc/heroproxy/mosdns/rule/ddnslist.txt"
 
   - tag: hosts
     type: hosts
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/hosts.txt"
+        - "/etc/heroproxy/mosdns/rule/hosts.txt"
 
   - tag: redirect
     type: redirect
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/redirect.txt"
+        - "/etc/heroproxy/mosdns/rule/redirect.txt"
 
   - tag: adlist
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/adlist.txt"
+        - "/etc/heroproxy/mosdns/rule/adlist.txt"
 
   - tag: local_ptr
     type: domain_set
     args:
       files:
-        - "/etc/homeproxy/mosdnsrule/localptr.txt"
+        - "/etc/heroproxy/mosdns/rule/localptr.txt"
 
   - tag: ecs_local
     type: ecs_handler
@@ -86,7 +86,7 @@ plugins:
     args:
       size: 0
       lazy_cache_ttl: 0
-      dump_file: /etc/homeproxy/mosdnscache.dump
+      dump_file: /etc/heroproxy/mosdns/cache.dump
       dump_interval: 0
 
   - tag: reject_3

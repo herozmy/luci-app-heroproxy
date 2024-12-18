@@ -2,33 +2,55 @@
 local dsp = require "luci.dispatcher"
 -%>
 
+<fieldset class="cbi-section">
+    <legend><%:Running Status%></legend>
+    <table width="100%" cellspacing="10" id="heroproxy_status">
+        <tr>
+            <td width="33%"><%:Sing-box Status%></td>
+            <td id="singbox_status"><em><%:Collecting data...%></em></td>
+        </tr>
+        <tr>
+            <td width="33%"><%:Mosdns Status%></td>
+            <td id="mosdns_status"><em><%:Collecting data...%></em></td>
+        </tr>
+    </table>
+</fieldset>
+
 <script type="text/javascript">//<![CDATA[
 XHR.poll(3, '<%=dsp.build_url("admin/services/heroproxy/status")%>', null,
     function(x, data) {
-        var tb = document.getElementById('heroproxy_status');
-        var tb2 = document.getElementById('mosdns_status');
-        if (data && tb && tb2) {
-            if (data.singbox_running) {
-                tb.innerHTML = '<em><b><font color=green><%:运行中%></font></b></em>';
-            } else {
-                tb.innerHTML = '<em><b><font color=red><%:未运行%></font></b></em>';
-            }
+        var singbox_status = document.getElementById('singbox_status');
+        var mosdns_status = document.getElementById('mosdns_status');
+        
+        if (data && singbox_status && mosdns_status) {
+            singbox_status.innerHTML = data.singbox_running ? 
+                '<em><b><font color=green><%:Running%></font></b></em>' : 
+                '<em><b><font color=red><%:Not running%></font></b></em>';
             
-            if (data.mosdns_running) {
-                tb2.innerHTML = '<em><b><font color=green><%:运行中%></font></b></em>';
-            } else {
-                tb2.innerHTML = '<em><b><font color=red><%:未运行%></font></b></em>';
-            }
+            mosdns_status.innerHTML = data.mosdns_running ? 
+                '<em><b><font color=green><%:Running%></font></b></em>' : 
+                '<em><b><font color=red><%:Not running%></font></b></em>';
         }
     }
 );
 //]]></script>
 
+<script type="text/javascript">
+function cleanRules() {
+    var loading = document.getElementById('clean_rules_loading');
+    if (loading) loading.style.display = 'inline';
+    
+    XHR.get('<%=url("admin/services/heroproxy/clean_rules")%>', null,
+        function(x, data) {
+            if (loading) loading.style.display = 'none';
+            if (data && data.code === 0) {
+                location.reload();
+            }
+        }
+    );
+    return false;
+}
+</script>
+
 <style>.mar-10 { margin-left: 50px; margin-right: 10px; }</style>
-<fieldset class="cbi-section">
-    <p>
-    Sing-box 状态：<span id="heroproxy_status"><em><%:获取中...%></em></span>
-    <span class="mar-10"></span>
-    Mosdns 状态：<span id="mosdns_status"><em><%:获取中...%></em></span>
-    </p>
-</fieldset> 
+  </rewritten_file>
