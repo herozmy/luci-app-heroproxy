@@ -1,0 +1,80 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "HeroProxy"
+msgstr "HeroProxy"
+
+msgid "基于 sing-box 的代理工具"
+msgstr "基于 sing-box 的代理工具"
+
+msgid "基本设置"
+msgstr "基本设置"
+
+msgid "启用"
+msgstr "启用"
+
+msgid "Sing-box 路径"
+msgstr "Sing-box 路径"
+
+msgid "sing-box 可执行文件的路径"
+msgstr "sing-box 可执行文件的路径"
+
+msgid "Sing-box 配置文件路径"
+msgstr "Sing-box 配置文件路径"
+
+msgid "sing-box 配置文件的路径"
+msgstr "sing-box 配置文件的路径"
+
+msgid "Mosdns 路径"
+msgstr "Mosdns 路径"
+
+msgid "mosdns 可执行文件的路径"
+msgstr "mosdns 可执行文件的路径"
+
+msgid "Mosdns 工作目录"
+msgstr "Mosdns 工作目录"
+
+msgid "mosdns 的工作目录路径"
+msgstr "mosdns 的工作目录路径"
+
+msgid "Mosdns 配置文件路径"
+msgstr "Mosdns 配置文件路径"
+
+msgid "mosdns 配置文件的路径"
+msgstr "mosdns 配置文件的路径"
+
+msgid "运行状态"
+msgstr "运行状态"
+
+msgid "刷新状态"
+msgstr "刷新状态"
+
+msgid "刷���"
+msgstr "刷新"
+
+msgid "Sing-box Status"
+msgstr "Sing-box 状态"
+
+msgid "Mosdns Status"
+msgstr "Mosdns 状态"
+
+msgid "Collecting data..."
+msgstr "正在收集数据..."
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Not running"
+msgstr "未运行"
+
+msgid "Sing-box 设置"
+msgstr "Sing-box 设置"
+
+msgid "Mosdns 设置"
+msgstr "Mosdns 设置"
+
+msgid "配置文件路径"
+msgstr "配置文件路径"
+
+msgid "工作目录"
+msgstr "工作目录" 
