@@ -20,35 +20,4 @@ o.description = translate("sing-box 配置文件的路径，可选：") ..
     "<br/>/etc/heroproxy/config-p.json (P核心配置)" ..
     "<br/>/etc/heroproxy/config-x.json (X核心配置)"
 
--- 添加核心切换按钮
-o = s:option(Button, "_switch_official", translate("切换到官方核心"))
-o.inputstyle = "apply"
-o.write = function()
-    local uci = require "luci.model.uci".cursor()
-    uci:set("heroproxy", "config", "core_path", "/etc/heroproxy/core/sing-box/sing-box")
-    uci:set("heroproxy", "config", "config_path", "/etc/heroproxy/config.json")
-    uci:commit("heroproxy")
-    luci.sys.call("/etc/init.d/heroproxy restart >/dev/null 2>&1")
-end
-
-o = s:option(Button, "_switch_p", translate("切换到P核心"))
-o.inputstyle = "apply"
-o.write = function()
-    local uci = require "luci.model.uci".cursor()
-    uci:set("heroproxy", "config", "core_path", "/etc/heroproxy/core/sing-box-p/sing-box")
-    uci:set("heroproxy", "config", "config_path", "/etc/heroproxy/config-p.json")
-    uci:commit("heroproxy")
-    luci.sys.call("/etc/init.d/heroproxy restart >/dev/null 2>&1")
-end
-
-o = s:option(Button, "_switch_x", translate("切换到X核心"))
-o.inputstyle = "apply"
-o.write = function()
-    local uci = require "luci.model.uci".cursor()
-    uci:set("heroproxy", "config", "core_path", "/etc/heroproxy/core/sing-box-x/sing-box")
-    uci:set("heroproxy", "config", "config_path", "/etc/heroproxy/config-x.json")
-    uci:commit("heroproxy")
-    luci.sys.call("/etc/init.d/heroproxy restart >/dev/null 2>&1")
-end
-
 return m 

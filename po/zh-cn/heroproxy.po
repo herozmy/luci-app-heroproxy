@@ -105,4 +105,58 @@ msgstr "未安装"
 
 msgid "下载安装"
 msgstr "下载安装"
+
+msgid "当前核心"
+msgstr "当前核心"
+
+msgid "Sing-box 核心"
+msgstr "Sing-box 核心"
+
+msgid "Mosdns 核心"
+msgstr "Mosdns 核心"
+
+msgid "官方核心"
+msgstr "官方核心"
+
+msgid "P核心"
+msgstr "P核心"
+
+msgid "X核心"
+msgstr "X核心"
+
+msgid "Web 界面"
+msgstr "Web ��面"
+
+msgid "打开 UI"
+msgstr "打开 UI"
+
+msgid "打开"
+msgstr "打开"
+
+msgid "核心未安装"
+msgstr "核心未安装"
+
+msgid "点击安装"
+msgstr "点击安装"
+
+msgid "前往安装"
+msgstr "前往安装"
+
+msgid "Sing-box 运行状态"
+msgstr "Sing-box 运行状态"
+
+msgid "Mosdns 运行状态"
+msgstr "Mosdns 运行状态"
+
+msgid "正在检查..."
+msgstr "正在检查..."
+
+msgid "切换到官方核心"
+msgstr "切换到官方核心"
+
+msgid "切换到P核心"
+msgstr "切换到P核心"
+
+msgid "切换到X核心"
+msgstr "切换到X核心"
  
