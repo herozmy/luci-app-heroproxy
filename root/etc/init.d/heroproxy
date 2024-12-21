@@ -31,7 +31,7 @@ start_service() {
     if [ "$enabled" = "1" ]; then
         log "Starting service..."
         
-        # 创建日志文��并设置权限
+        # 创建日志文件并设置权限
         mkdir -p /etc/heroproxy/mosdns
         touch /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
         chmod 666 /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
@@ -136,6 +136,8 @@ stop_service() {
     
     # 删除防火墙规则
     nft delete table inet singbox 2>/dev/null
+    # 重新加载 nft 规则
+    nft -f /etc/nftables.conf
     
     # 恢复 dnsmasq 配置但暂不重启
     log "Restoring dnsmasq config..."
@@ -185,6 +187,6 @@ start() {
     mkdir -p /etc/heroproxy/rule/geoip
     mkdir -p /etc/heroproxy/rule/geosite
     
-    # 启动服务
+    # 启���服务
     /etc/init.d/heroproxy start
 } 
