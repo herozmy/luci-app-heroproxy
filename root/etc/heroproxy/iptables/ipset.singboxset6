@@ -1,0 +1,11 @@
+create singboxset6 hash:net family inet6 hashsize 1024 maxelem 65536 bucketsize 12 initval 0xc25079e1
+add singboxset6 2001:67c:4e8::/48
+add singboxset6 2607:fb10::/32
+add singboxset6 2a00:86c0::/32
+add singboxset6 2a03:5640::/32
+add singboxset6 2001:b28:f23d::/48
+add singboxset6 2001:b28:f23f::/48
+add singboxset6 2001:b28:f23c::/48
+add singboxset6 2620:10c:7000::/44
+add singboxset6 2a0a:f280::/32
+add singboxset6 fc00::/18

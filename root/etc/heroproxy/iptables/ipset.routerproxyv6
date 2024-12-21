@@ -1,0 +1,2 @@
+create routerproxyv6 hash:net family inet6 hashsize 1024 maxelem 65536 bucketsize 12 initval 0x474f82a5
+add routerproxyv6 fc00::/18

@@ -1,0 +1,5 @@
+create routerproxy hash:net family inet hashsize 1024 maxelem 65536 bucketsize 12 initval 0xe4b92099
+add routerproxy 1.1.1.1
+add routerproxy 8.8.4.4
+add routerproxy 8.8.8.8
+add routerproxy 28.0.0.0/8

@@ -22,6 +22,12 @@ EOF
 
 # 创建必要的目录和文件
 mkdir -p /etc/heroproxy/nftables
+mkdir -p /etc/heroproxy/iptables
+mkdir -p /etc/heroproxy/mosdns
+mkdir -p /etc/heroproxy/core/sing-box
+mkdir -p /etc/heroproxy/core/sing-box-p
+mkdir -p /etc/heroproxy/core/sing-box-x
+mkdir -p /etc/heroproxy/core/mosdns
 touch /etc/heroproxy/heroproxy.log
 touch /etc/heroproxy/singbox.log
 touch /etc/heroproxy/mosdns.log

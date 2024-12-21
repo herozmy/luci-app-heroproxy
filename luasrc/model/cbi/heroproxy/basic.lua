@@ -26,12 +26,7 @@ o_singbox.cfgvalue = function(self, section)
     
     -- 检查核心是否存在
     if nixio.fs.access(core_path, "x") then
-        return core_path .. " (" .. core_type .. ")" ..
-               ' <div class="cbi-value-field" style="display:inline-block; margin-left: 10px">' ..
-               ' <input type="button" class="btn cbi-button cbi-button-apply" value="' .. translate("切换到官方核心") .. '" onclick="switchCore(\'official\')" />' ..
-               ' <input type="button" class="btn cbi-button cbi-button-apply" value="' .. translate("切换到P核心") .. '" onclick="switchCore(\'p\')" />' ..
-               ' <input type="button" class="btn cbi-button cbi-button-apply" value="' .. translate("切换到X核心") .. '" onclick="switchCore(\'x\')" />' ..
-               '</div>'
+        return core_path .. " (" .. core_type .. ")"
     else
         return '<span style="color: red">' .. translate("未安装") .. '</span>' .. 
                ' <a href="' .. 
@@ -41,42 +36,6 @@ o_singbox.cfgvalue = function(self, section)
                '</a>'
     end
 end
-
--- 添加核心切换的 JavaScript
-o_singbox.extra = [[
-<script type="text/javascript">
-function switchCore(type) {
-    var paths = {
-        'official': '/etc/heroproxy/core/sing-box/sing-box',
-        'p': '/etc/heroproxy/core/sing-box-p/sing-box',
-        'x': '/etc/heroproxy/core/sing-box-x/sing-box'
-    };
-    var configs = {
-        'official': '/etc/heroproxy/config.json',
-        'p': '/etc/heroproxy/config-p.json',
-        'x': '/etc/heroproxy/config-x.json'
-    };
-    
-    var xhr = new XHR();
-    xhr.get(']] .. luci.dispatcher.build_url("admin/uci/set") .. [[', 
-        { config: 'heroproxy', section: 'config', option: 'core_path', value: paths[type] },
-        function() {
-            xhr.get(']] .. luci.dispatcher.build_url("admin/uci/set") .. [[',
-                { config: 'heroproxy', section: 'config', option: 'config_path', value: configs[type] },
-                function() {
-                    xhr.get(']] .. luci.dispatcher.build_url("admin/uci/commit") .. [[',
-                        { config: 'heroproxy' },
-                        function() {
-                            location.reload();
-                        }
-                    );
-                }
-            );
-        }
-    );
-}
-</script>
-]]
 
 -- 显示 mosdns 核心信息
 local o_mosdns = s_cores:option(DummyValue, "mosdns_path", translate("Mosdns 核心"))

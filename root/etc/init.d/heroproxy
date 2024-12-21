@@ -3,6 +3,42 @@
 START=99
 USE_PROCD=1
 
+# 检查防火墙类型
+check_firewall_type() {
+    if command -v nft >/dev/null 2>&1 && uci -q get firewall.@defaults[0].fw4_compatible >/dev/null 2>&1; then
+        echo "nftables"
+    else
+        echo "iptables"
+    fi
+}
+
+# 添加防火墙规则
+add_firewall_rules() {
+    local fw_type="$1"
+    
+    if [ "$fw_type" = "nftables" ]; then
+        # 使用 nftables 规则
+        nft -f /etc/heroproxy/nftables/tproxy.conf
+    else
+        # 使用 iptables 规则
+        sh /etc/heroproxy/iptables/tproxy.sh
+    fi
+}
+
+# 删除防火墙规则
+del_firewall_rules() {
+    local fw_type="$1"
+    
+    if [ "$fw_type" = "nftables" ]; then
+        # 删除 nftables 规则
+        nft delete table inet singbox 2>/dev/null
+        nft -f /etc/nftables.conf
+    else
+        # 删除 iptables 规则
+        sh /etc/heroproxy/iptables/clean.sh
+    fi
+}
+
 # 修改日志函数
 log() {
     local msg="$1"
@@ -76,9 +112,17 @@ start_service() {
             log "Warning: Backup file already exists, skipping network configuration"
         fi
         
+        # 检查防火墙类型并加载对应规则
+        local fw_type=$(check_firewall_type)
+        log "Current firewall type: $fw_type"
+        
         # 添加防火墙和路由规则
         log "Adding firewall and routing rules..."
-        nft -f /etc/heroproxy/nftables/tproxy.conf
+        if [ "$fw_type" = "nftables" ]; then
+            add_firewall_rules "nftables"
+        else
+            add_firewall_rules "iptables"
+        fi
         
         # 启动 sing-box
         log "Starting sing-box..."
@@ -134,10 +178,12 @@ stop_service() {
     killall mosdns 2>/dev/null
     sleep 2
     
+    # 检查防火墙类型并清理对应规则
+    local fw_type=$(check_firewall_type)
+    log "Current firewall type: $fw_type"
+    
     # 删除防火墙规则
-    nft delete table inet singbox 2>/dev/null
-    # 重新加载 nft 规则
-    nft -f /etc/nftables.conf
+    del_firewall_rules "$fw_type"
     
     # 恢复 dnsmasq 配置但暂不重启
     log "Restoring dnsmasq config..."
@@ -187,6 +233,6 @@ start() {
     mkdir -p /etc/heroproxy/rule/geoip
     mkdir -p /etc/heroproxy/rule/geosite
     
-    # 启���服务
+    # 启动服务
     /etc/init.d/heroproxy start
 } 
