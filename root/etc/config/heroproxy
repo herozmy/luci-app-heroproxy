@@ -1,4 +1,5 @@
 config heroproxy 'config'
     option enabled '0'
-    option core_path '/usr/bin/sing-box'
-    option config_path '/etc/heroproxy/config.json' 
+    option core_path '/etc/heroproxy/core/sing-box/sing-box'
+    option config_path '/etc/heroproxy/config.json'
+    option mosdns_path '/etc/heroproxy/core/mosdns/mosdns' 

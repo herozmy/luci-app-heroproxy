@@ -7,8 +7,8 @@ PKG_RELEASE:=1
 PKG_LICENSE:=GPL-3.0
 PKG_MAINTAINER:=Your Name <your@email.com>
 
-LUCI_TITLE:=LuCI support for HeroProxy
-LUCI_DEPENDS:=+sing-box +mosdns
+LUCI_TITLE:=LuCI support for HeroProxy (Please install tar and unzip manually)
+LUCI_DEPENDS:=
 LUCI_PKGARCH:=all
 
 # 定义配置文件

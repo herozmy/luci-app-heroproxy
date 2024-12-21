@@ -5,7 +5,7 @@ local s = m:section(TypedSection, "heroproxy", translate("Mosdns 设置"))
 s.anonymous = true
 
 local o = s:option(Value, "mosdns_path", translate("Mosdns 路径"))
-o.default = "/usr/bin/mosdns"
+o.default = "/etc/heroproxy/core/mosdns/mosdns"
 o.rmempty = false
 o.description = translate("mosdns 可执行文件的路径")
 
