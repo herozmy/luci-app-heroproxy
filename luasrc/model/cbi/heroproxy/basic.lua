@@ -26,7 +26,19 @@ o_singbox.cfgvalue = function(self, section)
     
     -- 检查核心是否存在
     if nixio.fs.access(core_path, "x") then
-        return core_path .. " (" .. core_type .. ")"
+        -- 获取完整版本信息（不使用 head 命令，获取全部输出）
+        local version = luci.sys.exec(core_path .. " version 2>/dev/null")
+        -- 移除末尾的换行符
+        version = version:gsub("[\r\n]+$", "")
+        -- 如果获取失败则显示未知版本
+        if version == "" then
+            version = "未知版本"
+        else
+            -- 保留完整输出，不做任何过滤
+            version = version:gsub("^sing%-box version ", "")
+        end
+        
+        return core_path .. " (" .. core_type .. " - " .. version .. ")"
     else
         return '<span style="color: red">' .. translate("未安装") .. '</span>' .. 
                ' <a href="' .. 
@@ -45,7 +57,16 @@ o_mosdns.cfgvalue = function(self, section)
     
     -- 检查核心是否存在
     if nixio.fs.access(mosdns_path, "x") then
-        return mosdns_path
+        -- 获取完整版本信息
+        local version = luci.sys.exec(mosdns_path .. " version 2>/dev/null")
+        -- 移除末尾的换行符
+        version = version:gsub("[\r\n]+$", "")
+        -- 如果获取失败则显示未知版本
+        if version == "" then
+            version = "未知版本"
+        end
+        
+        return mosdns_path .. " (" .. version .. ")"
     else
         return '<span style="color: red">' .. translate("未安装") .. '</span>' .. 
                ' <a href="' .. 

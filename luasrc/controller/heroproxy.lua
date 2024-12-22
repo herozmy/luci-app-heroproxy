@@ -52,7 +52,13 @@ function action_check_core()
     for type, path in pairs(cores) do
         if nixio.fs.access(path, "x") then
             e[type .. "_exists"] = true
-            e[type .. "_version"] = sys.exec(path .. " version 2>/dev/null"):match("sing%-box version ([%d%.]+)")
+            -- 获取版本信息，只取第一行
+            local version = sys.exec(path .. " version 2>/dev/null | head -n1")
+            -- 移除末尾的换行符
+            version = version:gsub("[\r\n]+$", "")
+            -- 只保留 "sing-box version" 后面的部分
+            version = version:gsub("^sing%-box version ", "")
+            e[type .. "_version"] = version ~= "" and version or "未知版本"
         else
             e[type .. "_exists"] = false
         end
@@ -63,7 +69,8 @@ function action_check_core()
     if nixio.fs.access(mosdns_path, "x") then
         e.mosdns_exists = true
         local version = sys.exec(mosdns_path .. " version 2>/dev/null")
-        e.mosdns_version = version:match("v([%d%.]+)") or version:match("version%s+([%d%.]+)") or version:match("([%d%.]+)")
+        version = version:gsub("[\r\n]+$", "")
+        e.mosdns_version = version ~= "" and version or "未知版本"
     else
         e.mosdns_exists = false
     end
@@ -88,7 +95,7 @@ function download_core()
         
         -- 创建安装目录
         if sys.call(string.format("mkdir -p '%s'", install_dir)) == 0 then
-            -- 下载文件
+            -- ���载文件
             if sys.call(string.format("cd '%s' && wget -O '%s' '%s'", 
                 install_dir, zip_file, download_url)) == 0 then
                 -- 解压并安装
@@ -147,7 +154,7 @@ function download_core()
                             result.error = "Extract failed"
                         end
                     else
-                        -- 其他核心的原有处理
+                        -- 其他心的原有处理
                         if sys.call(string.format(
                             "cd '%s' && tar -xzf sing-box.tar.gz && mv sing-box*/sing-box sing-box && chmod +x sing-box",
                             core_dir)) ~= 0 then
@@ -177,4 +184,27 @@ function download_core()
     
     http.prepare_content("application/json")
     http.write_json(result)
+end
+
+function get_core_status()
+    local e = {}
+    local core_path = uci:get("heroproxy", "config", "core_path") or "/etc/heroproxy/core/sing-box/sing-box"
+    
+    if nixio.fs.access(core_path, "x") then
+        local version = luci.sys.exec(core_path .. " version 2>/dev/null")
+        version = version:gsub("[\r\n]+$", "")
+        if version ~= "" then
+            version = version:gsub("^sing%-box version ", "")
+        else
+            version = "未知版本"
+        end
+        
+        e.singbox_status = {
+            installed = true,
+            version = version
+        }
+    end
+    
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(e)
 end 
