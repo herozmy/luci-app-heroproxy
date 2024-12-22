@@ -111,6 +111,12 @@ define Package/$(PKG_NAME)/install
     # 安装其他文件
     $(INSTALL_BIN) ./root/etc/init.d/heroproxy $(1)/etc/init.d/
     $(INSTALL_CONF) ./root/etc/config/heroproxy $(1)/etc/config/
+    
+    # 创建 view 目录并安装模板
+    $(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/heroproxy
+    $(INSTALL_DATA) ./luasrc/view/heroproxy/notice.htm $(1)/usr/lib/lua/luci/view/heroproxy/
+    $(INSTALL_DATA) ./luasrc/view/heroproxy/status.htm $(1)/usr/lib/lua/luci/view/heroproxy/
+    $(INSTALL_DATA) ./luasrc/view/heroproxy/core_status.htm $(1)/usr/lib/lua/luci/view/heroproxy/
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk

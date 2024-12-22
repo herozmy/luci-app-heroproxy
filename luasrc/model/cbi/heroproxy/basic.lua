@@ -1,5 +1,31 @@
 local m = Map("heroproxy", translate("HeroProxy"), translate("基于 sing-box 的代理工具"))
 
+-- 添加注意事项说明
+local s_notice = m:section(TypedSection, "heroproxy", translate("注意事项"))
+s_notice.anonymous = true
+s_notice.addremove = false
+
+local notice = s_notice:option(DummyValue, "notice")
+notice.rawhtml = true
+notice.value = [[
+• 自建节点推荐使用：官方内核<br />
+• 机场节点推荐使用：P核心 或 X核心
+]]
+
+-- 添加使用方法说明
+local s_usage = m:section(TypedSection, "heroproxy", translate("使用方法"))
+s_usage.anonymous = true
+s_usage.addremove = false
+
+local usage = s_usage:option(DummyValue, "usage")
+usage.rawhtml = true
+usage.value = [[
+1. 进入 openwrt /etc/heroproxy/ 路径修改配置文件<br />
+2. config.json - 根据 sing-box 文档手动添加自建节点<br />
+3. config-p.json、config-x.json - 根据 sing-box 文档手动添加自建节点，Ctrl+F 搜索：机场连接 替换为机场订阅<br />
+4. 修改完成后保存，根据需要切换相应 sing-box、mosdns 内核，启用服务
+]]
+
 -- 基本设置部分
 local s = m:section(TypedSection, "heroproxy", translate("基本设置"))
 s.anonymous = true
@@ -28,7 +54,7 @@ o_singbox.cfgvalue = function(self, section)
     if nixio.fs.access(core_path, "x") then
         -- 获取版本信息，只取第一行
         local version = luci.sys.exec(core_path .. " version 2>/dev/null | head -n1")
-        -- 移除末尾的换行符
+        -- 移除尾的换行符
         version = version:gsub("[\r\n]+$", "")
         -- 只保留 "sing-box version" 后面的部分
         version = version:gsub("^sing%-box version ", "")
@@ -62,7 +88,7 @@ o_mosdns.cfgvalue = function(self, section)
         version = version:gsub("[\r\n]+$", "")
         -- 如果获取失败则显示未知版本
         if version == "" then
-            version = "未知版本"
+            version = "未知��本"
         end
         
         return mosdns_path .. " (" .. version .. ")"

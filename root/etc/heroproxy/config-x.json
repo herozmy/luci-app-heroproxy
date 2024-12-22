@@ -13,7 +13,7 @@
       },
       "cache_file": {
         "enabled": true,
-        "path": "/etc/heroproxy/sing-box-x/cache.db",
+        "path": "/etc/heroproxy/x_cache.db",
         "store_fakeip": true
       }
     },
