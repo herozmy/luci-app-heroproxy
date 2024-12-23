@@ -5,9 +5,11 @@ USE_PROCD=1
 
 # 检查防火墙类型
 check_firewall_type() {
-    if command -v nft >/dev/null 2>&1 && uci -q get firewall.@defaults[0].fw4_compatible >/dev/null 2>&1; then
+    # 优先检查是否有 nft 命令
+    if command -v nft >/dev/null 2>&1; then
         echo "nftables"
     else
+        # 如果没有 nft，则使用 iptables
         echo "iptables"
     fi
 }
