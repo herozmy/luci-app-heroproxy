@@ -7,7 +7,7 @@
     "experimental": {
       "clash_api": {
         "external_controller": "0.0.0.0:9090",
-        "external_ui": "/etc/heroproxy/sing-box-x/ui",
+        "external_ui": "/etc/heroproxy/ui",
         "secret": "",
         "default_mode": "rule"
       },
