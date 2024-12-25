@@ -1,0 +1,25 @@
+<%+cbi/valueheader%>
+<%
+    if self.inputstyle == "reset" then
+%>
+        <input type="button" class="btn cbi-button cbi-button-<%=self.inputstyle%>" value="<%=self.inputtitle%>" onclick="clearLog()" />
+        <script type="text/javascript">
+            function clearLog() {
+                (new XHR()).get('<%=luci.dispatcher.build_url("admin/services/heroproxy/mosdns/clear_log")%>', null,
+                    function(x) {
+                        if (x.status == 200) {
+                            window.location.reload();
+                        }
+                    }
+                );
+            }
+        </script>
+<%
+    else
+        local url = luci.dispatcher.build_url(luci.http.getenv("PATH_INFO"))
+%>
+        <input type="button" class="btn cbi-button cbi-button-<%=self.inputstyle%>" value="<%=self.inputtitle%>" onclick="location.href='<%=url%>'" />
+<%
+    end
+%>
+<%+cbi/valuefooter%> 

@@ -11,7 +11,11 @@ function index()
     entry({"admin", "services", "heroproxy", "basic"}, cbi("heroproxy/basic"), _("基本设置"), 10)
     entry({"admin", "services", "heroproxy", "cores"}, cbi("heroproxy/cores"), _("核心管理"), 15)
     entry({"admin", "services", "heroproxy", "singbox"}, cbi("heroproxy/singbox"), _("Sing-box设置"), 20)
-    entry({"admin", "services", "heroproxy", "mosdns"}, cbi("heroproxy/mosdns"), _("Mosdns设置"), 30)
+    entry({"admin", "services", "heroproxy", "mosdns"}, firstchild(), _("Mosdns设置"), 30)
+    entry({"admin", "services", "heroproxy", "mosdns", "config"}, cbi("heroproxy/mosdns"), _("基本配置"), 1)
+    entry({"admin", "services", "heroproxy", "mosdns", "rules"}, cbi("heroproxy/mosdns_rules"), _("规则配置"), 2)
+    entry({"admin", "services", "heroproxy", "mosdns", "log"}, cbi("heroproxy/mosdns_log"), _("运行日志"), 3)
+    entry({"admin", "services", "heroproxy", "mosdns", "clear_log"}, call("clear_mosdns_log"))
     entry({"admin", "services", "heroproxy", "status"}, call("status"))
     entry({"admin", "services", "heroproxy", "restart_singbox"}, call("restart_singbox"))
     entry({"admin", "services", "heroproxy", "restart_mosdns"}, call("restart_mosdns"))
@@ -204,7 +208,7 @@ function status()
     local core_path = uci:get("heroproxy", "config", "core_path") or "/etc/heroproxy/core/sing-box/sing-box"
     local mosdns_path = uci:get("heroproxy", "config", "mosdns_path") or "/etc/heroproxy/core/mosdns/mosdns"
     
-    -- 检查进程是否运行
+    -- 检查进程是否行
     data.singbox_running = sys.call("pgrep -f '" .. core_path:gsub("'", "'\\''") .. ".*run' >/dev/null") == 0
     data.mosdns_running = sys.call("pgrep -f '" .. mosdns_path:gsub("'", "'\\''") .. ".*start' >/dev/null") == 0
     
@@ -224,6 +228,12 @@ end
 
 function restart_mosdns()
     luci.sys.call("/etc/init.d/heroproxy restart_mosdns >/dev/null 2>&1")
+    luci.http.prepare_content("application/json")
+    luci.http.write_json({ code = 0 })
+end
+
+function clear_mosdns_log()
+    luci.sys.call("echo '' > /etc/heroproxy/mosdns.log")
     luci.http.prepare_content("application/json")
     luci.http.write_json({ code = 0 })
 end 

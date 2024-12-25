@@ -3,6 +3,11 @@ luci-app-heroproxy OpenWrt sing-box fakeip
 
 ## 版本历史
 
+### v4.0.0
+- 新增 Mosdns 白名单和灰名单配置界面
+- 支持在线编辑直连规则和代理规则
+- 优化了 Mosdns 配置管理
+
 ### v3.1.7
 - 优化了界面显示布局
 - 改进了服务控制按钮

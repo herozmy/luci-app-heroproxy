@@ -158,6 +158,7 @@ define Package/$(PKG_NAME)/install
     $(INSTALL_DATA) ./luasrc/view/heroproxy/notice.htm $(1)/usr/lib/lua/luci/view/heroproxy/
     $(INSTALL_DATA) ./luasrc/view/heroproxy/status.htm $(1)/usr/lib/lua/luci/view/heroproxy/
     $(INSTALL_DATA) ./luasrc/view/heroproxy/core_status.htm $(1)/usr/lib/lua/luci/view/heroproxy/
+    $(INSTALL_DATA) ./luasrc/view/heroproxy/button.htm $(1)/usr/lib/lua/luci/view/heroproxy/
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk

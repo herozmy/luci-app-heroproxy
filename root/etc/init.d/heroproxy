@@ -129,7 +129,7 @@ do_upgrade() {
 start_service() {
     # 检查版本并处理升级
     local current_version=$(uci -q get heroproxy.config.version)
-    local new_version="3.1.7"  # 当前版本号
+    local new_version="4.0.0"  # 当前版本号
     
     if [ "$current_version" != "$new_version" ]; then
         do_upgrade "$current_version" "$new_version"
@@ -148,8 +148,13 @@ start_service() {
         
         # 创建日志文件并设置权限
         mkdir -p /etc/heroproxy/mosdns
+        mkdir -p /etc/heroproxy/mosdns/rule
         touch /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
+        touch /etc/heroproxy/mosdns/rule/whitelist.txt
+        touch /etc/heroproxy/mosdns/rule/greylist.txt
         chmod 666 /etc/heroproxy/heroproxy.log /etc/heroproxy/singbox.log /etc/heroproxy/mosdns/mosdns.log
+        chmod 644 /etc/heroproxy/mosdns/rule/whitelist.txt
+        chmod 644 /etc/heroproxy/mosdns/rule/greylist.txt
         
         # 修改 dnsmasq 配置
         log "Configuring dnsmasq..."

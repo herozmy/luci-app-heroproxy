@@ -49,7 +49,7 @@ msgstr "运行状态"
 msgid "刷新状态"
 msgstr "刷新状态"
 
-msgid "刷��"
+msgid "刷"
 msgstr "刷新"
 
 msgid "Sing-box Status"
@@ -177,4 +177,28 @@ msgstr "确定要切换到P核心吗？这将会重启服务。"
 
 msgid "确定要切换到X核心吗？这将会重启服务。"
 msgstr "确定要切换到X核心吗？这将会重启服务。"
+
+msgid "运行日志"
+msgstr "运行日志"
+
+msgid "Mosdns 日志"
+msgstr "Mosdns 日志"
+
+msgid "刷新日志"
+msgstr "刷新日志"
+
+msgid "刷"
+msgstr "刷新"
+
+msgid "清空日志"
+msgstr "清空日志"
+
+msgid "清空"
+msgstr "清空"
+
+msgid "日志实时刷新"
+msgstr "日志实时刷新"
+
+msgid "确认要清空日志吗？"
+msgstr "确认要清空日志吗？"
  
