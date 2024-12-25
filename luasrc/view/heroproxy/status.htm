@@ -7,50 +7,122 @@ local dsp = require "luci.dispatcher"
     <table width="100%" cellspacing="10" id="heroproxy_status">
         <tr>
             <td width="33%"><%:Sing-box 运行状态%></td>
-            <td id="singbox_status"><em><%:正在检查...%></em></td>
+            <td>
+                <span id="singbox_status"><em><%:正在检查...%></em></span>
+                <span id="singbox_control" style="margin-left: 10px;"></span>
+            </td>
         </tr>
         <tr>
             <td width="33%"><%:Mosdns 运行状态%></td>
-            <td id="mosdns_status"><em><%:正在检查...%></em></td>
+            <td>
+                <span id="mosdns_status"><em><%:正在检查...%></em></span>
+                <span id="mosdns_control" style="margin-left: 10px;"></span>
+            </td>
         </tr>
     </table>
 </fieldset>
 
+<div class="cbi-section">
+    <div class="cbi-section-node">
+        <div class="cbi-value">
+            <div class="cbi-value-field">
+                <div class="control-buttons">
+                    <div class="main-buttons">
+                        <% if self.refresh then %>
+                            <%= self.refresh %>
+                        <% end %>
+                        <% if self.restart then %>
+                            <%= self.restart %>
+                        <% end %>
+                    </div>
+                    <div id="service_buttons" style="display: inline-block;">
+                        <% if self._restart_singbox then %>
+                            <%= self._restart_singbox %>
+                        <% end %>
+                        <% if self._restart_mosdns then %>
+                            <%= self._restart_mosdns %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">//<![CDATA[
 XHR.poll(3, '<%=dsp.build_url("admin/services/heroproxy/status")%>', null,
     function(x, data) {
+        if (!x || !data) return;
+        
         var singbox_status = document.getElementById('singbox_status');
         var mosdns_status = document.getElementById('mosdns_status');
+        var singbox_control = document.getElementById('singbox_control');
+        var mosdns_control = document.getElementById('mosdns_control');
         
-        if (data && singbox_status && mosdns_status) {
+        if (!singbox_status || !mosdns_status || !singbox_control || !mosdns_control) return;
+        
+        // 只检查是否启用
+        if (data.enabled) {
+            // 更新 sing-box 状态和控制按钮
             singbox_status.innerHTML = data.singbox_running ? 
-                '<em><b><font color=green><%:Running%></font></b></em>' : 
-                '<em><b><font color=red><%:Not running%></font></b></em>';
+                '<em><b><font color=green><%:运行中%></font></b></em>' : 
+                '<em><b><font color=red><%:未运行%></font></b></em>';
             
+            singbox_control.innerHTML = '<input type="button" class="cbi-button cbi-button-' + 
+                (data.singbox_running ? 'reload' : 'apply') + 
+                '" onclick="restartService(\'singbox\')" value="' + 
+                (data.singbox_running ? '<%:重启%>' : '<%:启动%>') + '" />';
+            
+            // 更新 mosdns 状态和控制按钮
             mosdns_status.innerHTML = data.mosdns_running ? 
-                '<em><b><font color=green><%:Running%></font></b></em>' : 
-                '<em><b><font color=red><%:Not running%></font></b></em>';
+                '<em><b><font color=green><%:运行中%></font></b></em>' : 
+                '<em><b><font color=red><%:未运行%></font></b></em>';
+            
+            mosdns_control.innerHTML = '<input type="button" class="cbi-button cbi-button-' + 
+                (data.mosdns_running ? 'reload' : 'apply') + 
+                '" onclick="restartService(\'mosdns\')" value="' + 
+                (data.mosdns_running ? '<%:重启%>' : '<%:启动%>') + '" />';
+        } else {
+            // 服务未启用时清空按钮
+            singbox_control.innerHTML = '';
+            mosdns_control.innerHTML = '';
         }
     }
 );
-//]]></script>
 
-<script type="text/javascript">
-function cleanRules() {
-    var loading = document.getElementById('clean_rules_loading');
-    if (loading) loading.style.display = 'inline';
+function restartService(service) {
+    var btn = document.querySelector('#' + service + '_control input');
+    if (btn) {
+        btn.disabled = true;
+        btn.value = '<%:处理中...%>';
+    }
     
-    XHR.get('<%=url("admin/services/heroproxy/clean_rules")%>', null,
+    XHR.get('<%=dsp.build_url("admin/services/heroproxy/status")%>'.replace(/status$/, 'restart_' + service), null,
         function(x, data) {
-            if (loading) loading.style.display = 'none';
-            if (data && data.code === 0) {
+            if (x && x.status == 200) {
                 location.reload();
+            }
+            if (btn) {
+                btn.disabled = false;
+                btn.value = '<%:重启%>';
             }
         }
     );
-    return false;
 }
-</script>
+//]]></script>
 
-<style>.mar-10 { margin-left: 50px; margin-right: 10px; }</style>
-  </rewritten_file>
+<style>
+.control-buttons {
+    margin-top: 10px;
+}
+.control-buttons .cbi-button {
+    margin-right: 10px;
+}
+.main-buttons {
+    display: inline-block;
+    margin-right: 20px;
+}
+#service_buttons {
+    display: inline-block;
+}
+</style>

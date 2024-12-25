@@ -12,29 +12,11 @@ function index()
     entry({"admin", "services", "heroproxy", "cores"}, cbi("heroproxy/cores"), _("核心管理"), 15)
     entry({"admin", "services", "heroproxy", "singbox"}, cbi("heroproxy/singbox"), _("Sing-box设置"), 20)
     entry({"admin", "services", "heroproxy", "mosdns"}, cbi("heroproxy/mosdns"), _("Mosdns设置"), 30)
-    entry({"admin", "services", "heroproxy", "status"}, call("action_status"))
+    entry({"admin", "services", "heroproxy", "status"}, call("status"))
+    entry({"admin", "services", "heroproxy", "restart_singbox"}, call("restart_singbox"))
+    entry({"admin", "services", "heroproxy", "restart_mosdns"}, call("restart_mosdns"))
     entry({"admin", "services", "heroproxy", "check_core"}, call("action_check_core"))
     entry({"admin", "services", "heroproxy", "download_core"}, call("download_core"))
-end
-
-function action_status()
-    local sys = require "luci.sys"
-    local uci = require "luci.model.uci".cursor()
-    local e = {}
-    
-    -- 获取配置的路径
-    local core_path = uci:get("heroproxy", "config", "core_path") or "/usr/bin/sing-box"
-    local mosdns_path = uci:get("heroproxy", "config", "mosdns_path") or "/usr/bin/mosdns"
-    
-    -- 检查 sing-box 状态
-    e.singbox_running = sys.call("pgrep -f '" .. core_path:gsub("'", "'\\''") .. ".*run' >/dev/null") == 0
-    
-    -- 检查 mosdns 状态
-    e.mosdns_running = sys.call("pgrep -f '" .. mosdns_path:gsub("'", "'\\''") .. "' >/dev/null") == 0
-    
-    -- 返回 JSON 结果
-    luci.http.prepare_content("application/json")
-    luci.http.write_json(e)
 end
 
 function action_check_core()
@@ -95,7 +77,7 @@ function download_core()
         
         -- 创建安装目录
         if sys.call(string.format("mkdir -p '%s'", install_dir)) == 0 then
-            -- ���载文件
+            -- 下载文件
             if sys.call(string.format("cd '%s' && wget -O '%s' '%s'", 
                 install_dir, zip_file, download_url)) == 0 then
                 -- 解压并安装
@@ -207,4 +189,41 @@ function get_core_status()
     
     luci.http.prepare_content("application/json")
     luci.http.write_json(e)
+end
+
+function status()
+    local sys  = require "luci.sys"
+    local uci  = require "luci.model.uci".cursor()
+    local nixio = require "nixio"
+    local data = {}
+
+    -- 检查服务是否启用
+    data.enabled = (uci:get("heroproxy", "config", "enabled") == "1")
+    
+    -- 获取核心路径
+    local core_path = uci:get("heroproxy", "config", "core_path") or "/etc/heroproxy/core/sing-box/sing-box"
+    local mosdns_path = uci:get("heroproxy", "config", "mosdns_path") or "/etc/heroproxy/core/mosdns/mosdns"
+    
+    -- 检查进程是否运行
+    data.singbox_running = sys.call("pgrep -f '" .. core_path:gsub("'", "'\\''") .. ".*run' >/dev/null") == 0
+    data.mosdns_running = sys.call("pgrep -f '" .. mosdns_path:gsub("'", "'\\''") .. ".*start' >/dev/null") == 0
+    
+    -- 检查 pid 文件
+    data.singbox_pid = nixio.fs.access("/var/run/heroproxy.singbox.pid")
+    data.mosdns_pid = nixio.fs.access("/var/run/heroproxy.mosdns.pid")
+
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(data)
+end
+
+function restart_singbox()
+    luci.sys.call("/etc/init.d/heroproxy restart_singbox >/dev/null 2>&1")
+    luci.http.prepare_content("application/json")
+    luci.http.write_json({ code = 0 })
+end
+
+function restart_mosdns()
+    luci.sys.call("/etc/init.d/heroproxy restart_mosdns >/dev/null 2>&1")
+    luci.http.prepare_content("application/json")
+    luci.http.write_json({ code = 0 })
 end 

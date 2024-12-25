@@ -60,7 +60,7 @@ o_singbox.cfgvalue = function(self, section)
         version = version:gsub("^sing%-box version ", "")
         -- 如果获取失败则显示未知版本
         if version == "" then
-            version = "未知版本"
+            version = "��知版本"
         end
         
         return core_path .. " (" .. core_type .. " - " .. version .. ")"
@@ -88,7 +88,7 @@ o_mosdns.cfgvalue = function(self, section)
         version = version:gsub("[\r\n]+$", "")
         -- 如果获取失败则显示未知版本
         if version == "" then
-            version = "未知��本"
+            version = "未知版本"
         end
         
         return mosdns_path .. " (" .. version .. ")"
@@ -138,6 +138,21 @@ o.inputtitle = translate("重启")
 o.inputstyle = "apply"
 o.write = function()
     luci.sys.call("/etc/init.d/heroproxy restart >/dev/null 2>&1")
+    luci.http.redirect(luci.dispatcher.build_url("admin/services/heroproxy/basic"))
+end
+
+-- 添加服务控制按钮
+local restart_singbox = s2:option(Button, "_restart_singbox", translate("重启 Sing-box"))
+restart_singbox.inputstyle = "reload"
+restart_singbox.write = function()
+    os.execute("/etc/init.d/heroproxy restart_singbox >/dev/null 2>&1")
+    luci.http.redirect(luci.dispatcher.build_url("admin/services/heroproxy/basic"))
+end
+
+local restart_mosdns = s2:option(Button, "_restart_mosdns", translate("重启 Mosdns"))
+restart_mosdns.inputstyle = "reload"
+restart_mosdns.write = function()
+    os.execute("/etc/init.d/heroproxy restart_mosdns >/dev/null 2>&1")
     luci.http.redirect(luci.dispatcher.build_url("admin/services/heroproxy/basic"))
 end
 

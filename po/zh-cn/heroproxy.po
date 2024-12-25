@@ -49,7 +49,7 @@ msgstr "运行状态"
 msgid "刷新状态"
 msgstr "刷新状态"
 
-msgid "刷新"
+msgid "刷��"
 msgstr "刷新"
 
 msgid "Sing-box Status"
@@ -125,7 +125,7 @@ msgid "X核心"
 msgstr "X核心"
 
 msgid "Web 界面"
-msgstr "Web ��面"
+msgstr "Web 界面"
 
 msgid "打开 UI"
 msgstr "打开 UI"
@@ -159,4 +159,22 @@ msgstr "切换到P核心"
 
 msgid "切换到X核心"
 msgstr "切换到X核心"
+
+msgid "服务控制"
+msgstr "服务控制"
+
+msgid "重启 Sing-box"
+msgstr "重启 Sing-box"
+
+msgid "重启 Mosdns"
+msgstr "重启 Mosdns"
+
+msgid "确定要切换到官方核心吗？这将会重启服务。"
+msgstr "确定要切换到官方核心吗？这将会重启服务。"
+
+msgid "确定要切换到P核心吗？这将会重启服务。"
+msgstr "确定要切换到P核心吗？这将会重启服务。"
+
+msgid "确定要切换到X核心吗？这将会重启服务。"
+msgstr "确定要切换到X核心吗？这将会重启服务。"
  

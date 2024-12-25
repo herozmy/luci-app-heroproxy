@@ -12,11 +12,12 @@ EOF
 uci -q batch <<-EOF >/dev/null
 	set heroproxy.config=heroproxy
 	set heroproxy.config.enabled='0'
-	set heroproxy.config.core_path='/usr/bin/sing-box'
+	set heroproxy.config.core_path='/etc/heroproxy/core/sing-box/sing-box'
 	set heroproxy.config.config_path='/etc/heroproxy/config.json'
-	set heroproxy.config.mosdns_enabled='0'
-	set heroproxy.config.mosdns_path='/usr/bin/mosdns'
+	set heroproxy.config.mosdns_path='/etc/heroproxy/core/mosdns/mosdns'
+	set heroproxy.config.mosdns_dir='/etc/heroproxy/mosdns'
 	set heroproxy.config.mosdns_config='/etc/heroproxy/mosdns/config.yaml'
+	set heroproxy.config.version='3.1.7'
 	commit heroproxy
 EOF
 

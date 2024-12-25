@@ -68,33 +68,61 @@ function downloadCore(type) {
 
 XHR.poll(3, '<%=luci.dispatcher.build_url("admin/services/heroproxy/check_core")%>', null,
     function(x, data) {
-        if (data) {
-            var type = '<%=self.core_type%>';
-            var exists = false;
-            var version = '';
-            
-            if (type === 'mosdns') {
-                exists = data.mosdns_exists;
-                version = data.mosdns_version;
-            } else {
-                exists = data[type + '_exists'];
-                version = data[type + '_version'];
-            }
-            
-            document.getElementById(type + '_status').innerHTML = exists ? 
-                '<span style="color: green;"><%:已安装%></span>' : 
-                '<span style="color: red;"><%:未安装%></span>';
-            
-            document.getElementById(type + '_version').innerHTML = exists ? 
-                version : '<%:未安装%>';
-            
-            // 显示下载或更新按钮
-            document.getElementById(type + '_download').style.display = 
-                exists ? 'none' : 'block';
-            document.getElementById(type + '_update').style.display = 
-                exists ? 'block' : 'none';
+        if (!x || !data) return;
+        
+        var type = '<%=self.core_type%>';
+        var status_el = document.getElementById(type + '_status');
+        var version_el = document.getElementById(type + '_version');
+        var download_el = document.getElementById(type + '_download');
+        var update_el = document.getElementById(type + '_update');
+        
+        if (!status_el || !version_el || !download_el || !update_el) return;
+        
+        var exists = false;
+        var version = '';
+        
+        if (type === 'mosdns') {
+            exists = data.mosdns_exists;
+            version = data.mosdns_version;
+        } else {
+            exists = data[type + '_exists'];
+            version = data[type + '_version'];
         }
+        
+        document.getElementById(type + '_status').innerHTML = exists ? 
+            '<span style="color: green;"><%:已安装%></span>' : 
+            '<span style="color: red;"><%:未安装%></span>';
+        
+        document.getElementById(type + '_version').innerHTML = exists ? 
+            version : '<%:未安装%>';
+        
+        // 显示下载或更新按钮
+        document.getElementById(type + '_download').style.display = 
+            exists ? 'none' : 'block';
+        document.getElementById(type + '_update').style.display = 
+            exists ? 'block' : 'none';
     }
 );
 //]]></script>
-<%+cbi/valuefooter%> 
+<%+cbi/valuefooter%>
+
+<style>
+.core-info {
+    margin: 10px 0;
+}
+.core-info > div {
+    margin: 5px 0;
+}
+.core-info .status span,
+.core-info .version span,
+.core-info .path span {
+    margin-right: 10px;
+}
+.core-info .download,
+.core-info .update {
+    margin-top: 10px;
+}
+.core-info .btn {
+    margin-right: 10px;
+}
+</style> 
