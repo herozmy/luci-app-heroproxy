@@ -12,19 +12,19 @@ plugins:
     type: domain_set
     args:
       files:
-        - "/etc/heroproxy/mosdns/geosite_cn.txt"
+        - "/etc/heroproxy/mosdns/rule/geosite_cn.txt"
 
   - tag: geoip_cn
     type: ip_set
     args:
       files:
-        - "/etc/heroproxy/mosdns/geoip_cn.txt"
+        - "/etc/heroproxy/mosdns/rule/geoip_cn.txt"
 
   - tag: geosite_no_cn
     type: domain_set
     args:
       files:
-        - "/etc/heroproxy/mosdns/geosite_geolocation_noncn.txt"
+        - "/etc/heroproxy/mosdns/rule/geosite_geolocation_noncn.txt"
 
   - tag: whitelist
     type: domain_set
