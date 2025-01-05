@@ -16,7 +16,7 @@ uci -q batch <<-EOF >/dev/null
 	set heroproxy.config.config_path='/etc/heroproxy/config.json'
 	set heroproxy.config.mosdns_path='/etc/heroproxy/core/mosdns/mosdns'
 	set heroproxy.config.mosdns_dir='/etc/heroproxy/mosdns'
-	set heroproxy.config.mosdns_config='/etc/heroproxy/mosdns/config.yaml'
+	set heroproxy.config.mosdns_config='/etc/heroproxy/mosdns/config_ph.yaml'
 	set heroproxy.config.version='4.0.0'
 	set heroproxy.config.white_list=' '
 	set heroproxy.config.grey_list=' '

@@ -15,7 +15,7 @@ o.rmempty = false
 o.description = translate("mosdns 的工作目录路径")
 
 o = s:option(Value, "mosdns_config", translate("配置文件路径"))
-o.default = "/etc/heroproxy/mosdns/config.yaml"
+o.default = "/etc/heroproxy/mosdns/config_ph.yaml"
 o.rmempty = false
 o.description = translate("mosdns 配置文件的路径")
 

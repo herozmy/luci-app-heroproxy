@@ -142,7 +142,7 @@ define Package/$(PKG_NAME)/install
     $(CP) ./root/etc/heroproxy/config.json $(1)/etc/heroproxy/
     $(CP) ./root/etc/heroproxy/config-p.json $(1)/etc/heroproxy/
     $(CP) ./root/etc/heroproxy/nftables/* $(1)/etc/heroproxy/nftables/
-    $(CP) ./root/etc/heroproxy/mosdns/config.yaml $(1)/etc/heroproxy/mosdns/
+    $(CP) ./root/etc/heroproxy/mosdns/config_ph.yaml $(1)/etc/heroproxy/mosdns/
     $(CP) ./root/etc/heroproxy/rule/geoip/* $(1)/etc/heroproxy/rule/geoip/ || true
     $(CP) ./root/etc/heroproxy/rule/geosite/* $(1)/etc/heroproxy/rule/geosite/ || true
     
