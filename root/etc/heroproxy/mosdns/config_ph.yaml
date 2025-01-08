@@ -1,6 +1,6 @@
 log:
   level: error
-  file: "/tmp/mosdns.log"
+  file: "/etc/heroproxy/mosdns.log"
 
 api:
   http: "0.0.0.0:9099"
@@ -8,6 +8,15 @@ api:
 include: []
 
 plugins:
+#列表外域名访问记录
+  - tag: my_notinlist
+    type: domain_output
+    args:
+      file_stat: /etc/heroproxy/mosdns/gen/notinlist.txt
+      file_rule: /etc/heroproxy/mosdns/gen/notinrule.txt
+      max_entries: 10
+      dump_interval: 36000
+
 #访问过的realip的域名清单和生成规则
   - tag: my_realiplist
     type: domain_output
@@ -15,7 +24,7 @@ plugins:
       file_stat: /etc/heroproxy/mosdns/gen/realiplist.txt
       file_rule: /etc/heroproxy/mosdns/gen/realiprule.txt
       max_entries: 3000
-      dump_interval: 1800
+      dump_interval: 36005
 
 #访问过的fakeip的域名清单和生成规则
   - tag: my_fakeiplist
@@ -23,8 +32,8 @@ plugins:
     args:
       file_stat: /etc/heroproxy/mosdns/gen/fakeiplist.txt
       file_rule: /etc/heroproxy/mosdns/gen/fakeiprule.txt
-      max_entries: 100
-      dump_interval: 1800
+      max_entries: 1000
+      dump_interval: 36010
 
 #访问过的无v6 ip的域名清单和生成规则
   - tag: my_nov6list
@@ -33,7 +42,7 @@ plugins:
       file_stat: /etc/heroproxy/mosdns/gen/nov6list.txt
       file_rule: /etc/heroproxy/mosdns/gen/nov6rule.txt
       max_entries: 100
-      dump_interval: 1800
+      dump_interval: 36020
 
 #访问过的无v4 v6 ip的域名清单和生成规则
   - tag: my_nov4list
@@ -42,7 +51,25 @@ plugins:
       file_stat: /etc/heroproxy/mosdns/gen/nov4list.txt
       file_rule: /etc/heroproxy/mosdns/gen/nov4rule.txt
       max_entries: 10
-      dump_interval: 1800
+      dump_interval: 36030
+
+#节点域名无v6 ip的域名清单和生成规则
+  - tag: my_nodenov6list
+    type: domain_output
+    args:
+      file_stat: /etc/heroproxy/mosdns/gen/nodenov6list.txt
+      file_rule: /etc/heroproxy/mosdns/gen/nodenov6rule.txt
+      max_entries: 10
+      dump_interval: 36070
+
+#节点域名无v4 v6 ip的域名清单和生成规则
+  - tag: my_nodenov4list
+    type: domain_output
+    args:
+      file_stat: /etc/heroproxy/mosdns/gen/nodenov4list.txt
+      file_rule: /etc/heroproxy/mosdns/gen/nodenov4rule.txt
+      max_entries: 10
+      dump_interval: 36080
 
 #生成的realip规则
   - tag: my_realiprule
@@ -71,6 +98,29 @@ plugins:
     args:
       files:
         - "/etc/heroproxy/mosdns/gen/nov4rule.txt"
+
+#生成的节点没有v6的域名规则
+  - tag: my_nodenov6rule
+    type: domain_set
+    args:
+      files:
+        - "/etc/heroproxy/mosdns/gen/nodenov6rule.txt"
+
+#生成的节点没有ip的域名规则
+  - tag: my_nodenov4rule
+    type: domain_set
+    args:
+      files:
+        - "/etc/heroproxy/mosdns/gen/nodenov4rule.txt"
+
+#过期缓存
+  - tag: cache_all
+    type: cache
+    args:
+      size: 20000000
+      lazy_cache_ttl: 259200000
+      dump_file: /etc/heroproxy/mosdns/cache_all.dump
+      dump_interval: 36000
 
 #中国域名列表的过期缓存
   - tag: cache_cn
@@ -215,6 +265,8 @@ plugins:
       - matches: has_resp
         exec: accept
       - exec: $forward_local
+#     - matches: has_resp
+#        exec: cname_remover
 
 #转发国外请求到内部带过期缓存的服务
   - tag: forward_google_in
@@ -232,6 +284,8 @@ plugins:
       - matches: has_resp
         exec: accept
       - exec: $forward_google
+#      - matches: has_resp
+#        exec: cname_remover
 
 #缓存序列-国内域名
   - tag: sequence_local
@@ -257,6 +311,7 @@ plugins:
   - tag: sequence_not_in_list
     type: sequence
     args:
+      - exec: $my_notinlist
       - exec: drop_resp      #丢弃用于标记的blackhole ip
       - exec: $sequence_local #表外域名先带ecs发到国内
       - matches:    #对于223没有返回V6地址且不是污染地址的，接受
@@ -287,7 +342,13 @@ plugins:
         exec: $sequence_google      #google dns再查一次
       - matches: "!resp_ip 0.0.0.0/0 2000::/3"
         exec: ttl 60000                      #再没有IP延长TTL
-      - matches: "!resp_ip 0.0.0.0/0 2000::/3"
+      - matches:
+        - "!resp_ip 0.0.0.0/0 2000::/3"
+        - "qtype 28"
+        exec: $my_nov6list  #生成域名规则
+      - matches:
+        - "!resp_ip 0.0.0.0/0 2000::/3"
+        - "qtype 1"
         exec: $my_nov4list  #生成域名规则
       - matches: "!resp_ip 0.0.0.0/0 2000::/3"
         exec: accept                      #没有ip就接受
@@ -328,8 +389,6 @@ plugins:
   - tag: query_is_local_dns
     type: sequence
     args:
-      - matches: qname $whitelist
-        exec: black_hole 127.0.0.1 ::1
       - matches: qname $geosite_cn
         exec: black_hole 127.0.0.1 ::1
 
@@ -361,15 +420,12 @@ plugins:
     args:
       - matches: "qtype 6 12 65"
         exec: reject 0
+      - exec: $cache_all
+      - matches: "resp_ip 28.0.0.0/8 fc00::/18"
+        exec: $forward_fakeip
+      - matches: has_resp
+        exec: accept
       - matches: qname $blocklist
-        exec: reject 0
-      - matches:    #屏蔽没有v4地址的域名
-        - qname $blocklistv4
-        - qtype 1
-        exec: reject 0
-      - matches:    #屏蔽没有v6地址的域名
-        - qname $blocklistv6
-        - qtype 28
         exec: reject 0
       - exec: $hosts
       - matches: has_resp
@@ -379,12 +435,22 @@ plugins:
       - matches: "!qtype 1 28"
         exec: accept
       - matches: qname $greylist
+        exec: mark 22
+      - matches: mark 22
         exec: $sequence_fakeip
-      - matches: qname $greylist
+      - matches: mark 22
+        exec: accept
+      - matches: qname $whitelist
+        exec: mark 11
+      - matches: mark 11
+        exec: $sequence_local
+      - matches: mark 11
         exec: accept
       - matches: qname $realiplist
+        exec: mark 33
+      - matches: mark 33
         exec: $forward_google_in
-      - matches: qname $realiplist
+      - matches: mark 33
         exec: accept
       - matches:    #屏蔽没有v4地址的域名
         - qname $my_nov4rule
@@ -442,14 +508,39 @@ plugins:
         exec: accept
       - exec: $sequence_not_in_list  #其它走表外逻辑
 
-#处理列表外域名的缓存序列
+#专门用于解析域名节点，默认使用8888解析，5毫秒不通用换223解析
+  - tag: sbnodefallback
+    type: fallback
+    args:
+      primary: sequence_google
+      secondary: sequence_local
+      threshold: 5
+      always_standby: false
+
   - tag: sequence_sbnode
     type: sequence
     args:
+      - matches:    #屏蔽没有v4地址的域名
+        - qname $my_nodenov4rule
+        - qtype 1
+        exec: reject 0
+      - matches:    #屏蔽没有v6地址的域名
+        - qname $my_nodenov6rule
+        - qtype 28
+        exec: reject 0
       - exec: $cache_node
       - matches: has_resp
         exec: accept
-      - exec: $forward_local
+      - exec: sleep 1000
+      - exec: $sbnodefallback
+      - matches:
+        - "qtype 1" 
+        - "!resp_ip 0.0.0.0/0 2000::/3"
+        exec: $my_nodenov4list  #生成域名规则
+      - matches:
+        - "qtype 28" 
+        - "!resp_ip 0.0.0.0/0 2000::/3"
+        exec: $my_nodenov6list  #生成域名规则
 
 ####################对外服务端口定义部分############
 #解析节点域名的服务器

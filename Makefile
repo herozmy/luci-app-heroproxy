@@ -46,6 +46,7 @@ define Package/$(PKG_NAME)/postinst
 # 创建必要目录
 mkdir -p /etc/heroproxy/nftables
 mkdir -p /etc/heroproxy/mosdns
+mkdir -p /etc/heroproxy/core
 mkdir -p /etc/heroproxy/rule/geoip
 mkdir -p /etc/heroproxy/rule/geosite
 mkdir -p /etc/uci-defaults
